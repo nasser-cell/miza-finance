@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Miza"/>
+<meta name="theme-color" content="#0A0A0F"/>
+<link rel="manifest" href="./manifest.json"/>
+<title>Miza — Personal Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --surface: #13131A;
+  --surface2: #1C1C26;
+  --surface3: #252532;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #F0F0F5;
+  --text2: #9090A8;
+  --text3: #5A5A72;
+  --accent: #7C6EF5;
+  --accent2: #5B4FD4;
+  --accent-glow: rgba(124,110,245,0.15);
+  --green: #22D09A;
+  --green-bg: rgba(34,208,154,0.1);
+  --red: #F06060;
+  --red-bg: rgba(240,96,96,0.1);
+  --amber: #F5B942;
+  --amber-bg: rgba(245,185,66,0.1);
+  --blue: #60A5FA;
+  --blue-bg: rgba(96,165,250,0.1);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: 68px;
+  --header-h: 56px;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { font-size: 16px; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, select, textarea { font-family: inherit; color: var(--text); background: none; border: none; }
+input:focus, select:focus, textarea:focus { outline: none; }
+a { color: inherit; text-decoration: none; }
+.display { font-family: 'Space Grotesk', sans-serif; }
+
+/* === LAYOUT === */
+#app { display: flex; flex-direction: column; min-height: 100vh; min-height: -webkit-fill-available; }
+.view { display: none; flex-direction: column; flex: 1; padding-bottom: calc(var(--nav-h) + var(--safe-bottom)); }
+.view.active { display: flex; }
+.scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 16px 24px; }
+
+/* === TOP HEADER === */
+.top-bar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-top) + 12px) 16px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.top-bar-title { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 600; }
+.top-bar-action { width: 36px; height: 36px; border-radius: 50%; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+/* === BOTTOM NAV === */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,13,20,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-end;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 10px 4px 8px; gap: 4px; cursor: pointer;
+  transition: opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-icon { font-size: 22px; line-height: 1; transition: transform 0.15s; }
+.nav-label { font-size: 10px; font-weight: 500; color: var(--text3); letter-spacing: 0.02em; transition: color 0.15s; }
+.nav-item.active .nav-label { color: var(--accent); }
+.nav-item.active .nav-icon { transform: scale(1.1); }
+
+/* === FAB === */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 20px);
+  right: 20px;
+  z-index: 90;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 28px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 20px rgba(124,110,245,0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.fab:active { transform: scale(0.93); box-shadow: 0 2px 10px rgba(124,110,245,0.4); }
+
+/* === CARDS === */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.card-sm { padding: 14px 16px; border-radius: var(--r-lg); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* === METRIC GRID === */
+.metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+}
+.metric-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.metric-value { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; }
+.metric-value.green { color: var(--green); }
+.metric-value.red { color: var(--red); }
+.metric-value.amber { color: var(--amber); }
+.metric-value.purple { color: var(--accent); }
+.metric-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+/* === BALANCE HERO === */
+.balance-hero {
+  background: linear-gradient(135deg, #1A1630 0%, #120F2A 100%);
+  border: 1px solid rgba(124,110,245,0.2);
+  border-radius: var(--r-xl);
+  padding: 24px 20px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.balance-hero::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(124,110,245,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.balance-label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.balance-amount { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; margin-bottom: 16px; }
+.balance-row { display: flex; gap: 20px; }
+.balance-item { flex: 1; }
+.balance-item-label { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 3px; }
+.balance-item-value { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 600; }
+
+/* === PROGRESS === */
+.progress-wrap { background: var(--surface3); border-radius: 100px; overflow: hidden; }
+.progress-bar { height: 6px; border-radius: 100px; transition: width 0.5s ease; }
+.progress-bar.green { background: linear-gradient(90deg, var(--green), #1AAF82); }
+.progress-bar.amber { background: linear-gradient(90deg, var(--amber), #E5A030); }
+.progress-bar.red { background: linear-gradient(90deg, var(--red), #D04040); }
+.progress-bar.purple { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+
+/* === BILL ITEMS === */
+.bill-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.bill-item:last-child { border-bottom: none; padding-bottom: 0; }
+.bill-item:first-child { padding-top: 0; }
+.bill-icon { width: 40px; height: 40px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.bill-info { flex: 1; min-width: 0; }
+.bill-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bill-date { font-size: 12px; color: var(--text3); }
+.bill-right { text-align: right; flex-shrink: 0; }
+.bill-amount { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.bill-status { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 100px; }
+.status-paid { background: var(--green-bg); color: var(--green); }
+.status-pending { background: var(--amber-bg); color: var(--amber); }
+.status-overdue { background: var(--red-bg); color: var(--red); }
+
+/* === TRANSACTION ITEMS === */
+.tx-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.tx-item:last-child { border-bottom: none; }
+.tx-icon { width: 38px; height: 38px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.tx-meta { font-size: 12px; color: var(--text3); }
+.tx-amount { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--red); flex-shrink: 0; }
+
+/* === CATEGORY EXPENSE ITEMS === */
+.expense-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.expense-item:last-child { border-bottom: none; }
+.check-btn {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer; transition: all 0.2s;
+  background: none; padding: 0;
+}
+.check-btn.checked { background: var(--green); border-color: var(--green); }
+.check-btn .check-mark { font-size: 12px; opacity: 0; transition: opacity 0.15s; }
+.check-btn.checked .check-mark { opacity: 1; }
+.expense-icon { width: 38px; height: 38px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.expense-info { flex: 1; min-width: 0; }
+.expense-name { font-size: 14px; font-weight: 500; margin-bottom: 2px; transition: color 0.2s, text-decoration 0.2s; }
+.expense-item.paid .expense-name { text-decoration: line-through; color: var(--text3); }
+.expense-due { font-size: 12px; color: var(--text3); }
+.expense-right { text-align: right; flex-shrink: 0; }
+.expense-amount { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+.edit-btn { font-size: 18px; color: var(--text3); padding: 4px; border-radius: var(--r-sm); background: none; border: none; cursor: pointer; }
+
+/* === SECTION HEADERS === */
+.section-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 10px; }
+.section-title { font-size: 16px; font-weight: 600; }
+.section-link { font-size: 13px; color: var(--accent); font-weight: 500; cursor: pointer; }
+
+/* === FORM / MODAL === */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.75);
+  display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%; max-width: 600px; margin: 0 auto;
+  background: var(--surface);
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  padding: 0 0 calc(20px + var(--safe-bottom));
+  transform: translateY(60px);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  max-height: 92vh;
+  overflow-y: auto;
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; border-radius: 100px; background: var(--border2); margin: 12px auto 0; }
+.modal-header { padding: 16px 20px 0; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 18px; font-weight: 600; }
+.modal-close { width: 30px; height: 30px; border-radius: 50%; background: var(--surface3); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.modal-body { padding: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%; padding: 14px 16px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--r-md); font-size: 15px; color: var(--text);
+  transition: border-color 0.15s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+.amount-input-wrap { position: relative; }
+.amount-prefix { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--text2); font-weight: 500; }
+.amount-field { padding-left: 48px !important; font-size: 22px !important; font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+.cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cat-option {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 10px 4px; border-radius: var(--r-md);
+  background: var(--surface2); border: 1.5px solid transparent;
+  cursor: pointer; gap: 4px; transition: all 0.15s;
+}
+.cat-option.selected { border-color: var(--accent); background: var(--accent-glow); }
+.cat-option-icon { font-size: 20px; }
+.cat-option-name { font-size: 10px; color: var(--text2); text-align: center; line-height: 1.2; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-primary {
+  width: 100%; padding: 16px; border-radius: var(--r-lg);
+  background: var(--accent); color: #fff;
+  font-size: 16px; font-weight: 600; border: none; cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.btn-primary:active { transform: scale(0.98); background: var(--accent2); }
+.toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: var(--surface2); border-radius: var(--r-md); }
+.toggle { position: relative; width: 44px; height: 26px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: var(--surface3); border-radius: 100px; transition: 0.2s; cursor: pointer; }
+.toggle-slider::before { content: ''; position: absolute; width: 20px; height: 20px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+.toggle input:checked + .toggle-slider { background: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+.status-row { display: flex; gap: 8px; }
+.status-btn {
+  flex: 1; padding: 10px 8px; border-radius: var(--r-md);
+  background: var(--surface2); border: 1.5px solid transparent;
+  font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; text-align: center;
+}
+.status-btn.sel-paid { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+.status-btn.sel-pending { border-color: var(--amber); background: var(--amber-bg); color: var(--amber); }
+.status-btn.sel-overdue { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+
+/* === INSIGHTS === */
+.insight-card {
+  border-radius: var(--r-lg); padding: 16px; margin-bottom: 10px;
+  border: 1px solid var(--border);
+}
+.insight-card.purple { background: rgba(124,110,245,0.08); border-color: rgba(124,110,245,0.2); }
+.insight-card.green { background: var(--green-bg); border-color: rgba(34,208,154,0.2); }
+.insight-card.amber { background: var(--amber-bg); border-color: rgba(245,185,66,0.2); }
+.insight-card.red { background: var(--red-bg); border-color: rgba(240,96,96,0.2); }
+.insight-icon { font-size: 20px; margin-bottom: 8px; }
+.insight-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.insight-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+/* === SETTINGS === */
+.settings-section { margin-bottom: 24px; }
+.settings-label { font-size: 12px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; padding: 0 4px; margin-bottom: 8px; display: block; }
+.settings-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+  margin-bottom: 1px; cursor: pointer;
+}
+.settings-item:first-of-type { border-radius: var(--r-md) var(--r-md) 0 0; }
+.settings-item:last-of-type { border-radius: 0 0 var(--r-md) var(--r-md); margin-bottom: 0; }
+.settings-item:only-of-type { border-radius: var(--r-md); }
+.settings-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.settings-info { flex: 1; }
+.settings-name { font-size: 14px; font-weight: 500; }
+.settings-desc { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.settings-arrow { font-size: 14px; color: var(--text3); }
+.income-edit-wrap { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-md); padding: 12px 16px; }
+.income-edit-input { flex: 1; font-size: 20px; font-family: 'Space Grotesk', sans-serif; font-weight: 600; background: none; border: none; color: var(--text); }
+.save-income-btn { font-size: 13px; font-weight: 500; color: var(--accent); background: var(--accent-glow); padding: 6px 12px; border-radius: 8px; }
+
+/* === EMPTY STATE === */
+.empty-state { text-align: center; padding: 48px 20px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.empty-text { font-size: 14px; color: var(--text2); line-height: 1.5; }
+
+/* === FILTER PILLS === */
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 0 2px; scrollbar-width: none; -ms-overflow-style: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-pill {
+  flex-shrink: 0; padding: 7px 14px; border-radius: 100px;
+  background: var(--surface); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* === CHART DONUT === */
+.donut-wrap { display: flex; align-items: center; gap: 20px; }
+.donut-canvas-wrap { position: relative; width: 110px; height: 110px; flex-shrink: 0; }
+.donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
+.donut-center-val { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; }
+.donut-center-lbl { font-size: 10px; color: var(--text3); }
+.donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.legend-name { font-size: 12px; color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-pct { font-size: 12px; font-weight: 500; flex-shrink: 0; }
+
+/* === OVERDUE ALERT === */
+.overdue-alert {
+  background: var(--red-bg); border: 1px solid rgba(240,96,96,0.25);
+  border-radius: var(--r-lg); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+}
+.overdue-icon { font-size: 22px; flex-shrink: 0; }
+.overdue-text { font-size: 13px; color: var(--red); }
+.overdue-text strong { font-weight: 600; }
+
+/* === MISC === */
+.divider { height: 1px; background: var(--border); margin: 8px 0; }
+.tag { display: inline-block; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 500; }
+.tag-green { background: var(--green-bg); color: var(--green); }
+.tag-amber { background: var(--amber-bg); color: var(--amber); }
+.tag-red { background: var(--red-bg); color: var(--red); }
+.tag-purple { background: var(--accent-glow); color: var(--accent); }
+.tag-blue { background: var(--blue-bg); color: var(--blue); }
+select.form-input { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239090A8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 40px; }
+@media (min-width: 600px) {
+  .scroll-area { padding: 0 20px 28px; }
+  .modal-sheet { border-radius: var(--r-xl); margin-bottom: 40px; }
+  .modal-overlay { align-items: center; }
+  .metric-grid { grid-template-columns: repeat(4,1fr); }
+  .cat-grid { grid-template-columns: repeat(6, 1fr); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ========== DASHBOARD ========== -->
+  <div class="view active" id="view-dashboard">
+    <div class="top-bar">
+      <div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:2px;">Good day 👋</div>
+        <div class="top-bar-title display">Miza Finance</div>
+      </div>
+      <button class="top-bar-action" onclick="showView('view-settings')" aria-label="Settings">⚙️</button>
+    </div>
+    <div class="scroll-area" id="dash-scroll">
+      <div style="height:16px"></div>
+
+      <!-- Balance Hero -->
+      <div class="balance-hero" id="balance-hero">
+        <div class="balance-label">Current Balance</div>
+        <div class="balance-amount display" id="hero-balance">0 KD</div>
+        <div class="balance-row">
+          <div class="balance-item">
+            <div class="balance-item-label">Income</div>
+            <div class="balance-item-value display" id="hero-income">0 KD</div>
+          </div>
+          <div class="balance-item">
+            <div class="balance-item-label">Expenses</div>
+            <div class="balance-item-value display" id="hero-expenses" style="color:var(--red)">0 KD</div>
+          </div>
+          <div class="balance-item">
+            <div class="balance-item-label">Saved</div>
+            <div class="balance-item-value display" id="hero-saved" style="color:var(--green)">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overdue Alert -->
+      <div id="overdue-alert" class="overdue-alert" style="display:none">
+        <div class="overdue-icon">⚠️</div>
+        <div class="overdue-text" id="overdue-text"></div>
+      </div>
+
+      <!-- Metric Grid -->
+      <div class="metric-grid">
+        <div class="metric-card">
+          <div class="metric-label">Paid</div>
+          <div class="metric-value green display" id="m-paid">0 KD</div>
+          <div class="metric-sub" id="m-paid-pct">— of budget</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Pending</div>
+          <div class="metric-value amber display" id="m-pending">0 KD</div>
+          <div class="metric-sub" id="m-pending-count">— items</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Budget Left</div>
+          <div class="metric-value purple display" id="m-budget-left">0 KD</div>
+          <div class="metric-sub" id="m-budget-pct">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Completed</div>
+          <div class="metric-value green display" id="m-completed-pct">0%</div>
+          <div class="metric-sub" id="m-completed-sub">— of expenses paid</div>
+        </div>
+      </div>
+
+      <!-- Spending Chart -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Spending Breakdown</div>
+          <div style="font-size:12px;color:var(--text3)" id="chart-month"></div>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut-canvas-wrap">
+            <canvas id="dash-donut" width="110" height="110"></canvas>
+            <div class="donut-center">
+              <div class="donut-center-val display" id="donut-center-val">0 KD</div>
+              <div class="donut-center-lbl">Total</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donut-legend"></div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:6px">
+            <span>Budget used</span><span id="budget-used-pct">0%</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar purple" id="budget-bar" style="height:8px;width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Upcoming Bills -->
+      <div class="section-head">
+        <div class="section-title">Upcoming Bills</div>
+        <div class="section-link" onclick="showView('view-bills')">See all</div>
+      </div>
+      <div class="card" style="padding:0 20px">
+        <div id="upcoming-list"><div class="empty-state" style="padding:24px 0"><div class="empty-icon">📅</div><div class="empty-title">No upcoming bills</div></div></div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="section-head">
+        <div class="section-title">Recent Transactions</div>
+        <div class="section-link" onclick="showView('view-history')">See all</div>
+      </div>
+      <div class="card" style="padding:0 20px">
+        <div id="recent-tx-list"><div class="empty-state" style="padding:24px 0"><div class="empty-icon">🧾</div><div class="empty-title">No transactions yet</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BILLS / EXPENSES ========== -->
+  <div class="view" id="view-bills">
+    <div class="top-bar">
+      <div class="top-bar-title display">Bills & Expenses</div>
+      <button class="top-bar-action" onclick="openBillModal()" aria-label="Add bill">+</button>
+    </div>
+    <div class="scroll-area">
+      <div style="height:12px"></div>
+      <div class="filter-row" style="margin-bottom:16px" id="bills-filter">
+        <button class="filter-pill active" data-filter="all" onclick="setBillFilter('all',this)">All</button>
+        <button class="filter-pill" data-filter="pending" onclick="setBillFilter('pending',this)">Pending</button>
+        <button class="filter-pill" data-filter="overdue" onclick="setBillFilter('overdue',this)">Overdue</button>
+        <button class="filter-pill" data-filter="paid" onclick="setBillFilter('paid',this)">Paid</button>
+        <button class="filter-pill" data-filter="upcoming" onclick="setBillFilter('upcoming',this)">Next 7 Days</button>
+      </div>
+
+      <!-- Summary mini -->
+      <div class="metric-grid" style="grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <div class="metric-card">
+          <div class="metric-label" style="font-size:10px">Paid</div>
+          <div class="metric-value green display" style="font-size:18px" id="bm-paid">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label" style="font-size:10px">Pending</div>
+          <div class="metric-value amber display" style="font-size:18px" id="bm-pending">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label" style="font-size:10px">Overdue</div>
+          <div class="metric-value red display" style="font-size:18px" id="bm-overdue">0</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:0 20px">
+        <div id="bills-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== HISTORY ========== -->
+  <div class="view" id="view-history">
+    <div class="top-bar">
+      <div class="top-bar-title display">Transactions</div>
+      <button class="top-bar-action" onclick="openAddExpenseModal()" aria-label="Add transaction">+</button>
+    </div>
+    <div class="scroll-area">
+      <div style="height:12px"></div>
+      <div class="filter-row" style="margin-bottom:16px" id="tx-filter-row">
+        <button class="filter-pill active" data-cat="all" onclick="setTxFilter('all',this)">All</button>
+      </div>
+      <div class="card" style="padding:0 20px">
+        <div id="tx-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== INSIGHTS ========== -->
+  <div class="view" id="view-insights">
+    <div class="top-bar">
+      <div class="top-bar-title display">Insights</div>
+      <div style="font-size:12px;color:var(--text3)" id="insights-month-label"></div>
+    </div>
+    <div class="scroll-area">
+      <div style="height:12px"></div>
+      <div id="insights-content"></div>
+    </div>
+  </div>
+
+  <!-- ========== SETTINGS ========== -->
+  <div class="view" id="view-settings">
+    <div class="top-bar">
+      <button style="font-size:22px;padding:4px;background:none;border:none;color:var(--text);cursor:pointer" onclick="showView('view-dashboard')">←</button>
+      <div class="top-bar-title display">Settings</div>
+      <div style="width:36px"></div>
+    </div>
+    <div class="scroll-area">
+      <div style="height:16px"></div>
+
+      <div class="settings-section">
+        <span class="settings-label">Monthly Income</span>
+        <div class="income-edit-wrap">
+          <span style="font-size:15px;color:var(--text2);margin-right:4px">KD</span>
+          <input class="income-edit-input" type="number" id="income-setting" placeholder="1800" min="0"/>
+          <button class="save-income-btn" onclick="saveIncome()">Save</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <span class="settings-label">Data</span>
+        <div class="settings-item" onclick="exportData()">
+          <div class="settings-icon" style="background:var(--blue-bg)">💾</div>
+          <div class="settings-info"><div class="settings-name">Export Data</div><div class="settings-desc">Download all your data as JSON</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item" onclick="importDataPrompt()">
+          <div class="settings-icon" style="background:var(--amber-bg)">📂</div>
+          <div class="settings-info"><div class="settings-name">Import Data</div><div class="settings-desc">Restore from a backup file</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item" onclick="clearAllData()">
+          <div class="settings-icon" style="background:var(--red-bg)">🗑️</div>
+          <div class="settings-info"><div class="settings-name">Clear All Data</div><div class="settings-desc">Remove everything and start fresh</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <span class="settings-label">PWA Install</span>
+        <div class="settings-item" id="install-btn" onclick="installPWA()">
+          <div class="settings-icon" style="background:var(--accent-glow)">📱</div>
+          <div class="settings-info"><div class="settings-name">Add to Home Screen</div><div class="settings-desc">Install Miza as a native app</div></div>
+          <div class="settings-arrow">›</div>
+        </div>
+        <div class="settings-item">
+          <div class="settings-icon" style="background:var(--green-bg)">✅</div>
+          <div class="settings-info"><div class="settings-name">App Version</div><div class="settings-desc">Miza v1.0 — Data stored locally</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BOTTOM NAV ========== -->
+  <nav class="bottom-nav" role="navigation">
+    <button class="nav-item active" id="nav-dashboard" onclick="showView('view-dashboard')">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Dashboard</div>
+    </button>
+    <button class="nav-item" id="nav-bills" onclick="showView('view-bills')">
+      <div class="nav-icon">📋</div>
+      <div class="nav-label">Bills</div>
+    </button>
+    <button class="nav-item" id="nav-history" onclick="showView('view-history')">
+      <div class="nav-icon">🧾</div>
+      <div class="nav-label">History</div>
+    </button>
+    <button class="nav-item" id="nav-insights" onclick="showView('view-insights')">
+      <div class="nav-icon">📊</div>
+      <div class="nav-label">Insights</div>
+    </button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" onclick="openAddExpenseModal()" aria-label="Add expense">+</button>
+</div>
+
+<!-- ========== ADD EXPENSE MODAL ========== -->
+<div class="modal-overlay" id="modal-expense" role="dialog" aria-modal="true" aria-labelledby="modal-expense-title">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-expense-title">New Expense</div>
+      <button class="modal-close" onclick="closeModal('modal-expense')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Amount (KD)</label>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">KD</span>
+          <input class="form-input amount-field" type="number" id="exp-amount" placeholder="0.000" min="0" step="0.001" inputmode="decimal"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <div class="cat-grid" id="exp-cat-grid"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="exp-date"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Status</label>
+          <select class="form-input" id="exp-status">
+            <option value="paid">✅ Paid</option>
+            <option value="pending" selected>⏳ Pending</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">Notes (optional)</label>
+        <input class="form-input" type="text" id="exp-notes" placeholder="Add a note…" maxlength="100"/>
+      </div>
+      <input type="hidden" id="exp-edit-id"/>
+      <button class="btn-primary" style="margin-top:8px" onclick="saveExpense()">Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADD BILL MODAL ========== -->
+<div class="modal-overlay" id="modal-bill" role="dialog" aria-modal="true" aria-labelledby="modal-bill-title">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modal-bill-title">New Bill / Recurring</div>
+      <button class="modal-close" onclick="closeModal('modal-bill')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Bill Name</label>
+        <input class="form-input" type="text" id="bill-name" placeholder="e.g. Electricity Bill"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Amount (KD)</label>
+        <div class="amount-input-wrap">
+          <span class="amount-prefix">KD</span>
+          <input class="form-input amount-field" type="number" id="bill-amount" placeholder="0.000" min="0" step="0.001" inputmode="decimal"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <div class="cat-grid" id="bill-cat-grid"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Due Date</label>
+          <input class="form-input" type="date" id="bill-due"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Status</label>
+          <div class="status-row" style="margin-top:0" id="bill-status-row">
+            <button class="status-btn sel-pending" data-s="pending" onclick="setBillStatus('pending',this)">Pending</button>
+            <button class="status-btn" data-s="paid" onclick="setBillStatus('paid',this)">Paid</button>
+            <button class="status-btn" data-s="overdue" onclick="setBillStatus('overdue',this)">Overdue</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:16px">
+        <label class="form-label">Notes</label>
+        <input class="form-input" type="text" id="bill-notes" placeholder="Optional note…" maxlength="100"/>
+      </div>
+      <input type="hidden" id="bill-edit-id"/>
+      <button class="btn-primary" style="margin-top:8px" onclick="saveBill()">Save Bill</button>
+    </div>
+  </div>
+</div>
+
+<!-- TX Detail Modal -->
+<div class="modal-overlay" id="modal-tx-detail" role="dialog" aria-modal="true">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Transaction</div>
+      <button class="modal-close" onclick="closeModal('modal-tx-detail')">✕</button>
+    </div>
+    <div class="modal-body" id="tx-detail-body"></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// ============================================================
+// DATA & STORAGE
+// ============================================================
+const STORE_KEY = 'miza_data_v2';
+const CATS = [
+  { id:'housing',   name:'Housing',      icon:'🏠', color:'#7C6EF5' },
+  { id:'food',      name:'Food',         icon:'🍽️', color:'#22D09A' },
+  { id:'transport', name:'Transport',    icon:'🚗', color:'#60A5FA' },
+  { id:'utilities', name:'Utilities',    icon:'💡', color:'#F5B942' },
+  { id:'health',    name:'Health',       icon:'🏥', color:'#F06060' },
+  { id:'clothing',  name:'Clothing',     icon:'👗', color:'#E879F9' },
+  { id:'entertain', name:'Fun',          icon:'🎮', color:'#FB923C' },
+  { id:'education', name:'Education',    icon:'📚', color:'#34D399' },
+  { id:'savings',   name:'Savings',      icon:'💰', color:'#FBBF24' },
+  { id:'family',    name:'Family',       icon:'👨‍👩‍👧', color:'#A78BFA' },
+  { id:'telecom',   name:'Telecom',      icon:'📱', color:'#38BDF8' },
+  { id:'other',     name:'Other',        icon:'📦', color:'#94A3B8' },
+];
+
+let DATA = {
+  income: 1800,
+  transactions: [],
+  bills: [],
+  updatedAt: Date.now()
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) DATA = { ...DATA, ...JSON.parse(raw) };
+  } catch(e) {}
+  if (!DATA.transactions) DATA.transactions = [];
+  if (!DATA.bills) DATA.bills = [];
+}
+
+function save() {
+  DATA.updatedAt = Date.now();
+  localStorage.setItem(STORE_KEY, JSON.stringify(DATA));
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function today() { return new Date().toISOString().slice(0,10); }
+function fmt(n) { return parseFloat(n||0).toLocaleString('en-KW',{minimumFractionDigits:3,maximumFractionDigits:3}); }
+function fmtShort(n) {
+  const v = parseFloat(n||0);
+  if (v >= 1000) return (v/1000).toFixed(1)+'K';
+  return v.toLocaleString('en-KW',{minimumFractionDigits:0,maximumFractionDigits:0});
+}
+function getCat(id) { return CATS.find(c=>c.id===id) || CATS[CATS.length-1]; }
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr) - new Date(today());
+  return Math.ceil(diff / 86400000);
+}
+
+function billStatus(bill) {
+  if (bill.status === 'paid') return 'paid';
+  const d = daysUntil(bill.dueDate);
+  if (d !== null && d < 0) return 'overdue';
+  return bill.status || 'pending';
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+const VIEWS = ['dashboard','bills','history','insights','settings'];
+function showView(viewId) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navId = 'nav-' + viewId.replace('view-','');
+  const navEl = document.getElementById(navId);
+  if (navEl) navEl.classList.add('active');
+  // Re-render on show
+  if (viewId==='view-dashboard') renderDashboard();
+  if (viewId==='view-bills') renderBills();
+  if (viewId==='view-history') renderHistory();
+  if (viewId==='view-insights') renderInsights();
+  if (viewId==='view-settings') {
+    document.getElementById('income-setting').value = DATA.income;
+  }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.querySelectorAll('.modal-overlay').forEach(mo => {
+  mo.addEventListener('click', e => { if (e.target===mo) closeModal(mo.id); });
+});
+
+// ============================================================
+// CATEGORY GRIDS
+// ============================================================
+let selectedExpCat = 'food';
+let selectedBillCat = 'utilities';
+function buildCatGrid(containerId, selectVar, onChange) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = CATS.map(c => `
+    <button class="cat-option ${c.id===selectVar?'selected':''}" data-id="${c.id}" onclick="${onChange}('${c.id}',this)">
+      <span class="cat-option-icon">${c.icon}</span>
+      <span class="cat-option-name">${c.name}</span>
+    </button>
+  `).join('');
+}
+function selectExpCat(id, el) {
+  selectedExpCat = id;
+  document.querySelectorAll('#exp-cat-grid .cat-option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectBillCat(id, el) {
+  selectedBillCat = id;
+  document.querySelectorAll('#bill-cat-grid .cat-option').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ============================================================
+// ADD / EDIT EXPENSE (TRANSACTION)
+// ============================================================
+function openAddExpenseModal(editId) {
+  selectedExpCat = 'food';
+  buildCatGrid('exp-cat-grid', selectedExpCat, 'selectExpCat');
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-date').value = today();
+  document.getElementById('exp-status').value = 'pending';
+  document.getElementById('exp-notes').value = '';
+  document.getElementById('exp-edit-id').value = '';
+  document.getElementById('modal-expense-title').textContent = 'New Expense';
+
+  if (editId) {
+    const tx = DATA.transactions.find(t=>t.id===editId);
+    if (tx) {
+      selectedExpCat = tx.category;
+      buildCatGrid('exp-cat-grid', selectedExpCat, 'selectExpCat');
+      document.getElementById('exp-amount').value = tx.amount;
+      document.getElementById('exp-date').value = tx.date;
+      document.getElementById('exp-status').value = tx.status || 'paid';
+      document.getElementById('exp-notes').value = tx.notes || '';
+      document.getElementById('exp-edit-id').value = editId;
+      document.getElementById('modal-expense-title').textContent = 'Edit Expense';
+    }
+  }
+  openModal('modal-expense');
+  setTimeout(()=>document.getElementById('exp-amount').focus(), 300);
+}
+
+function saveExpense() {
+  const amount = parseFloat(document.getElementById('exp-amount').value);
+  if (!amount || amount <= 0) { document.getElementById('exp-amount').focus(); return; }
+  const date = document.getElementById('exp-date').value || today();
+  const status = document.getElementById('exp-status').value;
+  const notes = document.getElementById('exp-notes').value.trim();
+  const editId = document.getElementById('exp-edit-id').value;
+  if (editId) {
+    const idx = DATA.transactions.findIndex(t=>t.id===editId);
+    if (idx>=0) DATA.transactions[idx] = { ...DATA.transactions[idx], amount, category:selectedExpCat, date, status, notes };
+  } else {
+    DATA.transactions.unshift({ id:uid(), amount, category:selectedExpCat, date, status, notes });
+  }
+  save();
+  closeModal('modal-expense');
+  renderDashboard(); renderHistory();
+}
+
+function deleteExpense(id) {
+  if (!confirm('Delete this transaction?')) return;
+  DATA.transactions = DATA.transactions.filter(t=>t.id!==id);
+  save();
+  closeModal('modal-tx-detail');
+  renderDashboard(); renderHistory();
+}
+
+// ============================================================
+// BILLS
+// ============================================================
+let currentBillStatus = 'pending';
+function setBillStatus(s, el) {
+  currentBillStatus = s;
+  document.querySelectorAll('#bill-status-row .status-btn').forEach(b => {
+    b.className = 'status-btn';
+    if (b.dataset.s===s) b.className = 'status-btn sel-'+s;
+  });
+}
+
+function openBillModal(editId) {
+  selectedBillCat = 'utilities';
+  currentBillStatus = 'pending';
+  buildCatGrid('bill-cat-grid', selectedBillCat, 'selectBillCat');
+  document.getElementById('bill-name').value = '';
+  document.getElementById('bill-amount').value = '';
+  document.getElementById('bill-due').value = today();
+  document.getElementById('bill-notes').value = '';
+  document.getElementById('bill-edit-id').value = '';
+  document.getElementById('modal-bill-title').textContent = 'New Bill';
+  setBillStatus('pending', document.querySelector('#bill-status-row [data-s="pending"]'));
+
+  if (editId) {
+    const b = DATA.bills.find(x=>x.id===editId);
+    if (b) {
+      selectedBillCat = b.category;
+      currentBillStatus = b.status || 'pending';
+      buildCatGrid('bill-cat-grid', selectedBillCat, 'selectBillCat');
+      document.getElementById('bill-name').value = b.name;
+      document.getElementById('bill-amount').value = b.amount;
+      document.getElementById('bill-due').value = b.dueDate || today();
+      document.getElementById('bill-notes').value = b.notes || '';
+      document.getElementById('bill-edit-id').value = editId;
+      document.getElementById('modal-bill-title').textContent = 'Edit Bill';
+      setBillStatus(currentBillStatus, document.querySelector(`#bill-status-row [data-s="${currentBillStatus}"]`));
+    }
+  }
+  openModal('modal-bill');
+}
+
+function saveBill() {
+  const name = document.getElementById('bill-name').value.trim();
+  const amount = parseFloat(document.getElementById('bill-amount').value);
+  if (!name) { document.getElementById('bill-name').focus(); return; }
+  if (!amount || amount <= 0) { document.getElementById('bill-amount').focus(); return; }
+  const dueDate = document.getElementById('bill-due').value || today();
+  const notes = document.getElementById('bill-notes').value.trim();
+  const editId = document.getElementById('bill-edit-id').value;
+  if (editId) {
+    const idx = DATA.bills.findIndex(b=>b.id===editId);
+    if (idx>=0) DATA.bills[idx] = { ...DATA.bills[idx], name, amount, category:selectedBillCat, dueDate, status:currentBillStatus, notes };
+  } else {
+    DATA.bills.unshift({ id:uid(), name, amount, category:selectedBillCat, dueDate, status:currentBillStatus, notes });
+  }
+  save();
+  closeModal('modal-bill');
+  renderDashboard(); renderBills();
+}
+
+function toggleBillPaid(id) {
+  const b = DATA.bills.find(x=>x.id===id);
+  if (!b) return;
+  b.status = b.status === 'paid' ? 'pending' : 'paid';
+  save();
+  renderDashboard(); renderBills();
+}
+
+function deleteBill(id) {
+  if (!confirm('Delete this bill?')) return;
+  DATA.bills = DATA.bills.filter(b=>b.id!==id);
+  save();
+  renderDashboard(); renderBills();
+}
+
+// ============================================================
+// RENDER DASHBOARD
+// ============================================================
+let donutChart = null;
+function renderDashboard() {
+  const now = new Date();
+  document.getElementById('chart-month').textContent = now.toLocaleString('default',{month:'long',year:'numeric'});
+  document.getElementById('insights-month-label').textContent = now.toLocaleString('default',{month:'long'});
+
+  const income = parseFloat(DATA.income) || 0;
+  const txTotal = DATA.transactions.reduce((s,t) => s + parseFloat(t.amount||0), 0);
+  const paidTotal = DATA.transactions.filter(t=>t.status==='paid').reduce((s,t) => s + parseFloat(t.amount||0), 0);
+  const pendingTotal = DATA.transactions.filter(t=>t.status!=='paid').reduce((s,t) => s + parseFloat(t.amount||0), 0);
+  const pendingCount = DATA.transactions.filter(t=>t.status!=='paid').length;
+  const balance = income - txTotal;
+  const savePct = income > 0 ? Math.round(((income-txTotal)/income)*100) : 0;
+  const budgetPct = income > 0 ? Math.min(100, (txTotal/income)*100) : 0;
+  const completedPct = DATA.transactions.length > 0 ? Math.round((DATA.transactions.filter(t=>t.status==='paid').length / DATA.transactions.length)*100) : 0;
+
+  document.getElementById('hero-balance').textContent = fmtShort(Math.abs(balance)) + ' KD' + (balance<0?' ▼':' ▲');
+  document.getElementById('hero-income').textContent = fmtShort(income) + ' KD';
+  document.getElementById('hero-expenses').textContent = fmtShort(txTotal) + ' KD';
+  document.getElementById('hero-saved').textContent = Math.max(0,savePct) + '%';
+  document.getElementById('m-paid').textContent = fmtShort(paidTotal) + ' KD';
+  document.getElementById('m-paid-pct').textContent = income>0 ? Math.round((paidTotal/income)*100)+'% of income' : '—';
+  document.getElementById('m-pending').textContent = fmtShort(pendingTotal) + ' KD';
+  document.getElementById('m-pending-count').textContent = pendingCount + ' item' + (pendingCount!==1?'s':'');
+  document.getElementById('m-budget-left').textContent = fmtShort(Math.max(0,balance)) + ' KD';
+  document.getElementById('m-budget-pct').textContent = Math.max(0,savePct) + '% remaining';
+  document.getElementById('m-completed-pct').textContent = completedPct + '%';
+  document.getElementById('m-completed-sub').textContent = DATA.transactions.filter(t=>t.status==='paid').length + ' of ' + DATA.transactions.length + ' paid';
+  document.getElementById('donut-center-val').textContent = fmtShort(txTotal) + ' KD';
+  const barEl = document.getElementById('budget-bar');
+  barEl.style.width = budgetPct.toFixed(1) + '%';
+  barEl.className = 'progress-bar ' + (budgetPct>100?'red':budgetPct>75?'amber':'purple');
+  document.getElementById('budget-used-pct').textContent = Math.round(budgetPct) + '%';
+
+  // Overdue alert
+  const overdueCount = DATA.bills.filter(b=>billStatus(b)==='overdue').length;
+  const alertEl = document.getElementById('overdue-alert');
+  if (overdueCount > 0) {
+    alertEl.style.display = 'flex';
+    document.getElementById('overdue-text').innerHTML = `<strong>${overdueCount} bill${overdueCount>1?'s':''} overdue!</strong> Review your bills.`;
+  } else { alertEl.style.display = 'none'; }
+
+  // Donut
+  const catTotals = {};
+  DATA.transactions.forEach(t => { catTotals[t.category] = (catTotals[t.category]||0) + parseFloat(t.amount||0); });
+  const sortedCats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if (donutChart) { donutChart.destroy(); donutChart = null; }
+  const canvas = document.getElementById('dash-donut');
+  if (sortedCats.length > 0) {
+    donutChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: sortedCats.map(([id])=>getCat(id).name),
+        datasets:[{ data: sortedCats.map(([,v])=>v), backgroundColor: sortedCats.map(([id])=>getCat(id).color), borderWidth:0 }]
+      },
+      options: { responsive:false, cutout:'70%', plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${fmt(c.parsed)} KD`}}} }
+    });
+    document.getElementById('donut-legend').innerHTML = sortedCats.map(([id,v])=>`
+      <div class="legend-item">
+        <span class="legend-dot" style="background:${getCat(id).color}"></span>
+        <span class="legend-name">${getCat(id).name}</span>
+        <span class="legend-pct">${income>0?Math.round((v/income)*100):0}%</span>
+      </div>
+    `).join('');
+  } else {
+    document.getElementById('donut-legend').innerHTML = '<div style="font-size:13px;color:var(--text3)">No expenses yet</div>';
+  }
+
+  // Upcoming bills (next 14 days + overdue)
+  const upcoming = DATA.bills
+    .filter(b => { const s=billStatus(b); const d=daysUntil(b.dueDate); return s!=='paid' && (d===null||d<=14); })
+    .sort((a,b)=> (daysUntil(a.dueDate)||999) - (daysUntil(b.dueDate)||999))
+    .slice(0,5);
+  const upEl = document.getElementById('upcoming-list');
+  if (upcoming.length===0) {
+    upEl.innerHTML = '<div class="empty-state" style="padding:24px 0"><div class="empty-icon">📅</div><div class="empty-title">All clear!</div></div>';
+  } else {
+    upEl.innerHTML = upcoming.map(b => billItemHTML(b)).join('');
+  }
+
+  // Recent transactions
+  const recent = [...DATA.transactions].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const rxEl = document.getElementById('recent-tx-list');
+  if (recent.length===0) {
+    rxEl.innerHTML = '<div class="empty-state" style="padding:24px 0"><div class="empty-icon">🧾</div><div class="empty-title">No transactions yet</div><div class="empty-text">Tap + to add your first expense</div></div>';
+  } else {
+    rxEl.innerHTML = recent.map(tx => txItemHTML(tx)).join('');
+  }
+}
+
+function billItemHTML(b) {
+  const cat = getCat(b.category);
+  const s = billStatus(b);
+  const d = daysUntil(b.dueDate);
+  let dueLabel = b.dueDate ? new Date(b.dueDate).toLocaleDateString('en-KW',{month:'short',day:'numeric'}) : '—';
+  if (d !== null) {
+    if (d < 0) dueLabel = `${Math.abs(d)}d overdue`;
+    else if (d === 0) dueLabel = 'Due today';
+    else if (d <= 7) dueLabel = `In ${d} day${d!==1?'s':''}`;
+  }
+  return `<div class="bill-item">
+    <button class="check-btn ${s==='paid'?'checked':''}" onclick="toggleBillPaid('${b.id}')" aria-label="Toggle paid"><span class="check-mark">✓</span></button>
+    <div class="bill-icon" style="background:${cat.color}22">${cat.icon}</div>
+    <div class="bill-info"><div class="bill-name">${b.name}</div><div class="bill-date">${dueLabel}</div></div>
+    <div class="bill-right">
+      <div class="bill-amount">${fmt(b.amount)}</div>
+      <span class="bill-status status-${s}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>
+    </div>
+  </div>`;
+}
+
+function txItemHTML(tx) {
+  const cat = getCat(tx.category);
+  const d = new Date(tx.date).toLocaleDateString('en-KW',{month:'short',day:'numeric'});
+  return `<div class="tx-item" onclick="openTxDetail('${tx.id}')">
+    <div class="tx-icon" style="background:${cat.color}22">${cat.icon}</div>
+    <div class="tx-info">
+      <div class="tx-name">${cat.name}${tx.notes?' — '+tx.notes.slice(0,22):''}</div>
+      <div class="tx-meta">${d} · <span class="${tx.status==='paid'?'tag tag-green':'tag tag-amber'}">${tx.status==='paid'?'Paid':'Pending'}</span></div>
+    </div>
+    <div class="tx-amount">-${fmt(tx.amount)} KD</div>
+  </div>`;
+}
+
+// ============================================================
+// RENDER BILLS VIEW
+// ============================================================
+let billFilter = 'all';
+function setBillFilter(f, el) {
+  billFilter = f;
+  document.querySelectorAll('#bills-filter .filter-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  renderBills();
+}
+function renderBills() {
+  const paid = DATA.bills.filter(b=>billStatus(b)==='paid');
+  const pending = DATA.bills.filter(b=>billStatus(b)==='pending');
+  const overdue = DATA.bills.filter(b=>billStatus(b)==='overdue');
+  document.getElementById('bm-paid').textContent = paid.length;
+  document.getElementById('bm-pending').textContent = pending.length;
+  document.getElementById('bm-overdue').textContent = overdue.length;
+
+  let filtered = DATA.bills;
+  if (billFilter==='paid') filtered = paid;
+  else if (billFilter==='pending') filtered = pending;
+  else if (billFilter==='overdue') filtered = overdue;
+  else if (billFilter==='upcoming') filtered = DATA.bills.filter(b => { const d=daysUntil(b.dueDate); return billStatus(b)!=='paid' && d!==null && d>=0 && d<=7; });
+
+  filtered = [...filtered].sort((a,b)=>(daysUntil(a.dueDate)||999)-(daysUntil(b.dueDate)||999));
+
+  const el = document.getElementById('bills-list');
+  if (filtered.length===0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">No bills here</div><div class="empty-text">Add a recurring bill with the + button</div></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(b => `
+    <div class="bill-item" style="position:relative">
+      <button class="check-btn ${billStatus(b)==='paid'?'checked':''}" onclick="toggleBillPaid('${b.id}')" aria-label="Toggle paid"><span class="check-mark">✓</span></button>
+      <div class="bill-icon" style="background:${getCat(b.category).color}22">${getCat(b.category).icon}</div>
+      <div class="bill-info">
+        <div class="bill-name">${b.name}</div>
+        <div class="bill-date">${b.dueDate ? dueDateLabel(b.dueDate) : 'No due date'}${b.notes?' · '+b.notes:''}</div>
+      </div>
+      <div class="bill-right" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <div class="bill-amount">${fmt(b.amount)} KD</div>
+        <span class="bill-status status-${billStatus(b)}">${capitalize(billStatus(b))}</span>
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <button onclick="openBillModal('${b.id}')" style="font-size:14px;color:var(--text3);background:none;border:none;cursor:pointer" aria-label="Edit">✏️</button>
+          <button onclick="deleteBill('${b.id}')" style="font-size:14px;color:var(--red);background:none;border:none;cursor:pointer" aria-label="Delete">🗑</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function dueDateLabel(dateStr) {
+  const d = daysUntil(dateStr);
+  const dateDisplay = new Date(dateStr).toLocaleDateString('en-KW',{month:'short',day:'numeric'});
+  if (d === null) return dateDisplay;
+  if (d < 0) return `${dateDisplay} · ${Math.abs(d)}d overdue`;
+  if (d === 0) return `${dateDisplay} · Due today`;
+  if (d <= 7) return `${dateDisplay} · In ${d} day${d!==1?'s':''}`;
+  return dateDisplay;
+}
+function capitalize(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+
+// ============================================================
+// RENDER HISTORY
+// ============================================================
+let txFilter = 'all';
+function setTxFilter(cat, el) {
+  txFilter = cat;
+  document.querySelectorAll('#tx-filter-row .filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderHistory();
+}
+function renderHistory() {
+  // Build filter pills
+  const usedCats = [...new Set(DATA.transactions.map(t=>t.category))];
+  const filterEl = document.getElementById('tx-filter-row');
+  filterEl.innerHTML = `<button class="filter-pill ${txFilter==='all'?'active':''}" data-cat="all" onclick="setTxFilter('all',this)">All</button>` +
+    usedCats.map(id => `<button class="filter-pill ${txFilter===id?'active':''}" data-cat="${id}" onclick="setTxFilter('${id}',this)">${getCat(id).icon} ${getCat(id).name}</button>`).join('');
+
+  let filtered = [...DATA.transactions].sort((a,b)=>b.date.localeCompare(a.date));
+  if (txFilter!=='all') filtered = filtered.filter(t=>t.category===txFilter);
+
+  const el = document.getElementById('tx-list');
+  if (filtered.length===0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-title">No transactions yet</div><div class="empty-text">Tap + or the FAB button to log an expense</div></div>';
+    return;
+  }
+  // Group by date
+  const groups = {};
+  filtered.forEach(tx => { groups[tx.date] = groups[tx.date]||[]; groups[tx.date].push(tx); });
+  el.innerHTML = Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([date, txs]) => `
+    <div>
+      <div style="font-size:12px;font-weight:500;color:var(--text3);padding:14px 0 6px;text-transform:uppercase;letter-spacing:0.05em">${new Date(date).toLocaleDateString('en-KW',{weekday:'short',month:'short',day:'numeric'})}</div>
+      ${txs.map(tx => txItemHTML(tx)).join('')}
+    </div>
+  `).join('');
+}
+
+// TX Detail
+function openTxDetail(id) {
+  const tx = DATA.transactions.find(t=>t.id===id);
+  if (!tx) return;
+  const cat = getCat(tx.category);
+  document.getElementById('tx-detail-body').innerHTML = `
+    <div style="text-align:center;padding:8px 0 20px">
+      <div style="font-size:48px;margin-bottom:8px">${cat.icon}</div>
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;margin-bottom:4px">${fmt(tx.amount)} KD</div>
+      <div style="font-size:14px;color:var(--text2)">${cat.name}</div>
+    </div>
+    <div style="background:var(--surface2);border-radius:var(--r-md);overflow:hidden;margin-bottom:20px">
+      ${row('Date', new Date(tx.date).toLocaleDateString('en-KW',{weekday:'long',year:'numeric',month:'long',day:'numeric'}))}
+      ${row('Status', `<span class="${tx.status==='paid'?'tag tag-green':'tag tag-amber'}">${capitalize(tx.status||'pending')}</span>`)}
+      ${tx.notes ? row('Notes', tx.notes) : ''}
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="openAddExpenseModal('${tx.id}');closeModal('modal-tx-detail')" style="flex:1;padding:14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-md);font-size:15px;font-weight:500;cursor:pointer;color:var(--text)">✏️ Edit</button>
+      <button onclick="deleteExpense('${tx.id}')" style="flex:1;padding:14px;background:var(--red-bg);border:1px solid rgba(240,96,96,0.2);border-radius:var(--r-md);font-size:15px;font-weight:500;cursor:pointer;color:var(--red)">🗑 Delete</button>
+    </div>
+  `;
+  openModal('modal-tx-detail');
+}
+function row(label, value) {
+  return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)">
+    <span style="font-size:13px;color:var(--text2)">${label}</span>
+    <span style="font-size:14px;font-weight:500">${value}</span>
+  </div>`;
+}
+
+// ============================================================
+// RENDER INSIGHTS
+// ============================================================
+function renderInsights() {
+  const income = parseFloat(DATA.income) || 0;
+  const txTotal = DATA.transactions.reduce((s,t)=>s+parseFloat(t.amount||0),0);
+  const paidAmt = DATA.transactions.filter(t=>t.status==='paid').reduce((s,t)=>s+parseFloat(t.amount||0),0);
+  const balance = income - txTotal;
+  const savePct = income>0?Math.round((balance/income)*100):0;
+
+  // Category breakdown
+  const catTotals = {};
+  DATA.transactions.forEach(t=>{ catTotals[t.category]=(catTotals[t.category]||0)+parseFloat(t.amount||0); });
+  const sorted = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const top = sorted[0];
+  const overdueBills = DATA.bills.filter(b=>billStatus(b)==='overdue');
+  const upcomingBills = DATA.bills.filter(b=>{ const d=daysUntil(b.dueDate); return billStatus(b)!=='paid'&&d!==null&&d>=0&&d<=7; });
+
+  let html = '';
+
+  // Savings progress
+  html += `<div class="insight-card ${savePct>=20?'green':savePct>=0?'amber':'red'}">
+    <div class="insight-icon">${savePct>=20?'🚀':savePct>=0?'📈':'⚠️'}</div>
+    <div class="insight-title">Savings: ${Math.max(0,savePct)}% of income</div>
+    <div class="insight-text">${savePct>=20?`Great savings rate! You've set aside ${fmt(balance)} KD this month.`:savePct>=0?`You're saving ${fmt(balance)} KD (${savePct}%). Try to reach 20% for healthy finances.`:`You're ${fmt(Math.abs(balance))} KD over budget. Review your expenses.`}</div>
+    <div style="margin-top:10px"><div class="progress-wrap"><div class="progress-bar ${savePct>=20?'green':savePct>=0?'amber':'red'}" style="height:6px;width:${Math.min(100,Math.max(0,txTotal/income*100)).toFixed(1)}%"></div></div></div>
+  </div>`;
+
+  // Top category
+  if (top) {
+    const cat = getCat(top[0]);
+    const pct = income>0?Math.round((top[1]/income)*100):0;
+    html += `<div class="insight-card purple">
+      <div class="insight-icon">${cat.icon}</div>
+      <div class="insight-title">Top spending: ${cat.name}</div>
+      <div class="insight-text">You've spent ${fmt(top[1])} KD on ${cat.name} this period — that's ${pct}% of your income.</div>
+    </div>`;
+  }
+
+  // Overdue
+  if (overdueBills.length > 0) {
+    const total = overdueBills.reduce((s,b)=>s+parseFloat(b.amount||0),0);
+    html += `<div class="insight-card red">
+      <div class="insight-icon">🚨</div>
+      <div class="insight-title">${overdueBills.length} overdue bill${overdueBills.length>1?'s':''}</div>
+      <div class="insight-text">Total overdue: ${fmt(total)} KD. Pay these immediately to avoid late fees: ${overdueBills.map(b=>b.name).join(', ')}.</div>
+    </div>`;
+  }
+
+  // Upcoming
+  if (upcomingBills.length > 0) {
+    const total = upcomingBills.reduce((s,b)=>s+parseFloat(b.amount||0),0);
+    html += `<div class="insight-card amber">
+      <div class="insight-icon">📅</div>
+      <div class="insight-title">${upcomingBills.length} bill${upcomingBills.length>1?'s':''} due in 7 days</div>
+      <div class="insight-text">Make sure you have ${fmt(total)} KD ready. Upcoming: ${upcomingBills.map(b=>b.name).join(', ')}.</div>
+    </div>`;
+  }
+
+  // Payment progress
+  const completedPct = DATA.transactions.length>0?Math.round((DATA.transactions.filter(t=>t.status==='paid').length/DATA.transactions.length)*100):0;
+  html += `<div class="insight-card ${completedPct>=75?'green':'amber'}">
+    <div class="insight-icon">✅</div>
+    <div class="insight-title">${completedPct}% of expenses marked paid</div>
+    <div class="insight-text">You've confirmed ${fmt(paidAmt)} KD paid out of ${fmt(txTotal)} KD total expenses.</div>
+    <div style="margin-top:10px"><div class="progress-wrap"><div class="progress-bar ${completedPct>=75?'green':'amber'}" style="height:6px;width:${completedPct}%"></div></div></div>
+  </div>`;
+
+  // Category spending list
+  if (sorted.length > 0) {
+    html += `<div class="card">
+      <div class="card-header"><div class="card-title">All Categories</div></div>
+      ${sorted.map(([id,v]) => {
+        const cat = getCat(id);
+        const pct = income>0?Math.min(100,(v/income)*100):0;
+        return `<div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:13px">${cat.icon} ${cat.name}</span>
+            <span style="font-size:13px;font-weight:500">${fmt(v)} KD</span>
+          </div>
+          <div class="progress-wrap"><div class="progress-bar" style="height:5px;width:${pct.toFixed(1)}%;background:${cat.color}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+
+  if (!html) html = '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No data yet</div><div class="empty-text">Add some expenses and bills to see insights about your finances.</div></div>';
+  document.getElementById('insights-content').innerHTML = html;
+}
+
+// ============================================================
+// SETTINGS ACTIONS
+// ============================================================
+function saveIncome() {
+  const v = parseFloat(document.getElementById('income-setting').value);
+  if (!v || v<=0) return;
+  DATA.income = v;
+  save();
+  renderDashboard();
+  showToast('Income updated ✓');
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'miza-backup-'+today()+'.json';
+  a.click();
+}
+
+function importDataPrompt() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (!imported.transactions) throw new Error('Invalid format');
+        DATA = imported;
+        save();
+        renderDashboard();
+        showToast('Data imported ✓');
+      } catch(err) { alert('Invalid file format'); }
+    };
+    reader.readAsText(f);
+  };
+  input.click();
+}
+
+function clearAllData() {
+  if (!confirm('This will delete all your data. Are you sure?')) return;
+  DATA = { income:1800, transactions:[], bills:[], updatedAt:Date.now() };
+  save();
+  renderDashboard();
+  showView('view-dashboard');
+  showToast('Data cleared');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+let toastTimer;
+function showToast(msg) {
+  let el = document.getElementById('toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'toast';
+    el.style.cssText = 'position:fixed;bottom:calc(var(--nav-h)+var(--safe-bottom)+80px);left:50%;transform:translateX(-50%);background:#1C1C2C;color:#fff;padding:10px 20px;border-radius:100px;font-size:14px;font-weight:500;z-index:300;border:1px solid rgba(255,255,255,0.1);transition:opacity 0.3s;white-space:nowrap';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.style.opacity='0'; }, 2200);
+}
+
+// ============================================================
+// PWA
+// ============================================================
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; });
+function installPWA() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r => { deferredPrompt = null; });
+  } else {
+    alert('To install on iPhone: tap the Share button → "Add to Home Screen".\n\nOn Android: tap "Add to Home Screen" in the browser menu.');
+  }
+}
+
+// ============================================================
+// SERVICE WORKER
+// ============================================================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+
+// ============================================================
+// SEED DATA (first run)
+// ============================================================
+function seedIfEmpty() {
+  if (DATA.bills.length === 0) {
+    const d = new Date();
+    const nxt = (n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x.toISOString().slice(0,10); };
+    DATA.bills = [
+      { id:uid(), name:'Rent', amount:250, category:'housing', dueDate:nxt(2), status:'pending', notes:'' },
+      { id:uid(), name:'Electricity (MEW)', amount:35, category:'utilities', dueDate:nxt(-3), status:'pending', notes:'' },
+      { id:uid(), name:'Zain Mobile', amount:12, category:'telecom', dueDate:nxt(5), status:'pending', notes:'' },
+      { id:uid(), name:'Internet (Qualitynet)', amount:18, category:'telecom', dueDate:nxt(10), status:'paid', notes:'' },
+      { id:uid(), name:'Gym', amount:22, category:'health', dueDate:nxt(15), status:'pending', notes:'' },
+    ];
+  }
+  if (DATA.transactions.length === 0) {
+    const d = new Date();
+    const ago = (n) => { const x=new Date(d); x.setDate(x.getDate()-n); return x.toISOString().slice(0,10); };
+    DATA.transactions = [
+      { id:uid(), amount:250, category:'housing', date:ago(1), status:'paid', notes:'Monthly rent' },
+      { id:uid(), amount:85, category:'food', date:ago(2), status:'paid', notes:'Lulu Hypermarket' },
+      { id:uid(), amount:45, category:'transport', date:ago(3), status:'paid', notes:'Petrol + parking' },
+      { id:uid(), amount:35, category:'utilities', date:ago(4), status:'pending', notes:'MEW electricity' },
+      { id:uid(), amount:60, category:'entertain', date:ago(5), status:'paid', notes:'Dinner + cinema' },
+      { id:uid(), amount:30, category:'health', date:ago(6), status:'pending', notes:'Pharmacy' },
+      { id:uid(), amount:18, category:'telecom', date:ago(7), status:'paid', notes:'Internet' },
+    ];
+  }
+  save();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+load();
+seedIfEmpty();
+renderDashboard();
+renderBills();
+renderHistory();
+renderInsights();
+</script>
+</body>
+</html>
