@@ -1,6 +1,11 @@
 const CACHE = 'miza-v2';
 const ASSETS = ['./index.html', './manifest.json'];
 
+// IMPORTANT: Increment CACHE version string every time you deploy code changes.
+// Change 'miza-v2' to 'miza-v3', then 'miza-v4', etc.
+// This ensures the activate event (line 10-12) deletes the old cache
+// and forces browsers to fetch the fresh index.html.
+
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
