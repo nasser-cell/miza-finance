@@ -1,4 +1,4 @@
-const CACHE = 'miza-v1';
+const CACHE = 'miza-v2';
 const ASSETS = ['./index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
