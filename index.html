@@ -44,14 +44,7 @@
 }
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { font-size: 16px; }
-body {
-  font-family: 'Inter', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-  overscroll-behavior: none;
-}
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
 input, select, textarea { font-family: inherit; color: var(--text); background: none; border: none; }
 input:focus, select:focus, textarea:focus { outline: none; }
@@ -180,6 +173,22 @@ a { color: inherit; text-decoration: none; }
 .cat-btn.delete:hover { background: rgba(240,96,96,0.2); }
 .cat-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: rgba(124,110,245,0.1); color: var(--accent); }
 
+/* TRANSACTION ITEMS */
+.tx-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px; background: var(--surface2); border-radius: var(--r-md);
+  margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.tx-item:hover { background: var(--surface3); }
+.tx-icon { font-size: 20px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: var(--r-sm); flex-shrink: 0; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-desc { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.tx-meta { font-size: 12px; color: var(--text3); }
+.tx-amount { font-family: 'Space Grotesk'; font-size: 15px; font-weight: 600; color: var(--red); flex-shrink: 0; }
+.tx-status { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 6px; }
+.tx-status.paid { background: rgba(34,208,154,0.1); color: var(--green); }
+.tx-status.pending { background: rgba(245,185,66,0.1); color: var(--amber); }
+
 /* MODAL */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 200;
@@ -218,7 +227,7 @@ a { color: inherit; text-decoration: none; }
 .form-input:focus { border-color: var(--accent); }
 .form-input::placeholder { color: var(--text3); }
 
-/* ICON PICKER */
+/* ICON/COLOR PICKER */
 .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .icon-option {
   padding: 12px; border-radius: var(--r-md); background: var(--surface2); border: 2px solid transparent;
@@ -227,7 +236,6 @@ a { color: inherit; text-decoration: none; }
 }
 .icon-option.selected { border-color: var(--accent); background: var(--accent-glow); }
 
-/* COLOR PICKER */
 .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
 .color-option {
   width: 100%; aspect-ratio: 1; border-radius: 50%; border: 3px solid transparent;
@@ -243,6 +251,11 @@ a { color: inherit; text-decoration: none; }
   transition: background 0.15s, transform 0.1s;
 }
 .btn-primary:active { transform: scale(0.98); background: var(--accent2); }
+.btn-danger {
+  width: 100%; padding: 16px; border-radius: var(--r-lg);
+  background: var(--red); color: #fff;
+  font-size: 16px; font-weight: 600; border: none; cursor: pointer;
+}
 
 /* SECTION */
 .section-head { display: flex; align-items: center; justify-content: space-between; padding: 20px 0 10px; }
@@ -353,6 +366,12 @@ a { color: inherit; text-decoration: none; }
         <div class="section-link" onclick="showView('view-categories')">Manage</div>
       </div>
       <div id="dash-categories"></div>
+
+      <div class="section-head" style="margin-top:20px">
+        <div class="section-title">Recent Transactions</div>
+        <div class="section-link" onclick="showView('view-history')">See all</div>
+      </div>
+      <div id="dash-recent-tx"></div>
     </div>
   </div>
 
@@ -368,6 +387,28 @@ a { color: inherit; text-decoration: none; }
       <div style="height:20px"></div>
       <button class="btn-primary" onclick="restoreDefaultCategories()" style="margin:0 4px">Restore Defaults</button>
       <div style="height:20px"></div>
+    </div>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="view" id="view-history">
+    <div class="top-bar">
+      <div class="top-bar-title display">Transactions</div>
+      <button class="top-bar-action" onclick="openAddTransactionModal()">+</button>
+    </div>
+    <div class="scroll-area">
+      <div style="height:12px"></div>
+      <div style="margin-bottom:12px">
+        <select class="form-input" id="tx-filter-cat" onchange="renderHistory()" style="margin-bottom:8px">
+          <option value="">All Categories</option>
+        </select>
+        <select class="form-input" id="tx-filter-status" onchange="renderHistory()">
+          <option value="">All Statuses</option>
+          <option value="paid">Paid</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div id="tx-list-container"></div>
     </div>
   </div>
 
@@ -396,6 +437,10 @@ a { color: inherit; text-decoration: none; }
     <button class="nav-item active" id="nav-dashboard" onclick="showView('view-dashboard')">
       <div class="nav-icon">🏠</div>
       <div class="nav-label">Dashboard</div>
+    </button>
+    <button class="nav-item" id="nav-history" onclick="showView('view-history')">
+      <div class="nav-icon">🧾</div>
+      <div class="nav-label">History</div>
     </button>
     <button class="nav-item" id="nav-categories" onclick="showView('view-categories')">
       <div class="nav-icon">📁</div>
@@ -452,20 +497,36 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
-<!-- ADD TRANSACTION MODAL -->
+<!-- ADD/EDIT TRANSACTION MODAL -->
 <div class="modal-overlay" id="modal-transaction">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-header">
-      <div class="modal-title">Add Expense</div>
+      <div class="modal-title" id="modal-tx-title">Add Transaction</div>
       <button class="modal-close" onclick="closeModal('modal-transaction')">✕</button>
     </div>
     <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <input class="form-input" type="text" id="tx-description" placeholder="What did you spend on?" maxlength="50"/>
+      </div>
+
       <div class="form-group">
         <label class="form-label">Amount (KD)</label>
         <div class="amount-input-wrap">
           <span class="amount-prefix">KD</span>
           <input class="form-input amount-field" type="number" id="tx-amount" placeholder="0.000" min="0" step="0.001" inputmode="decimal"/>
+        </div>
+      </div>
+
+      <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Date</label>
+          <input class="form-input" type="date" id="tx-date"/>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Time</label>
+          <input class="form-input" type="time" id="tx-time"/>
         </div>
       </div>
 
@@ -477,34 +538,46 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" type="date" id="tx-date"/>
+        <label class="form-label">Payment Method</label>
+        <select class="form-input" id="tx-payment">
+          <option value="cash">💵 Cash</option>
+          <option value="card">💳 Card</option>
+          <option value="bank">🏦 Bank Transfer</option>
+          <option value="wallet">📱 Digital Wallet</option>
+          <option value="other">📋 Other</option>
+        </select>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Notes (optional)</label>
-        <input class="form-input" type="text" id="tx-notes" placeholder="Add a note…" maxlength="100"/>
+        <label class="form-label">Status</label>
+        <select class="form-input" id="tx-status">
+          <option value="paid">✅ Paid</option>
+          <option value="pending">⏳ Pending</option>
+        </select>
       </div>
 
-      <button class="btn-primary" onclick="addTransaction()">Add Expense</button>
+      <input type="hidden" id="tx-edit-id"/>
+      
+      <button class="btn-primary" onclick="saveTransaction()" style="margin-top:8px" id="tx-save-btn">Add Transaction</button>
+      <div id="tx-delete-btn" style="display:none;margin-top:10px"></div>
     </div>
   </div>
 </div>
 
 <!-- DELETE CONFIRMATION DIALOG -->
-<div class="dialog-overlay" id="dialog-delete">
+<div class="dialog-overlay" id="dialog-delete-cat">
   <div class="dialog-box">
     <div class="dialog-title">Delete Category?</div>
     <div class="dialog-text" id="dialog-delete-text"></div>
     <div class="dialog-options">
-      <button class="dialog-btn secondary" onclick="closeDialog('dialog-delete')">Cancel</button>
+      <button class="dialog-btn secondary" onclick="closeDialog('dialog-delete-cat')">Cancel</button>
       <button class="dialog-btn primary" id="dialog-delete-confirm" onclick="">Delete</button>
     </div>
   </div>
 </div>
 
 <!-- TRANSACTION HANDLING DIALOG -->
-<div class="dialog-overlay" id="dialog-transactions">
+<div class="dialog-overlay" id="dialog-tx-handling">
   <div class="dialog-box">
     <div class="dialog-title">What to do with transactions?</div>
     <div class="dialog-text" id="dialog-tx-text"></div>
@@ -521,7 +594,7 @@ a { color: inherit; text-decoration: none; }
 // ============================================================
 // DATA MODEL
 // ============================================================
-const STORE_KEY = 'miza_data_v4';
+const STORE_KEY = 'miza_data_v5';
 const DEFAULT_ICONS = ['🏠','🍽️','🚗','💡','🏥','👗','🎮','📚','💰','👨‍👩‍👧','📱','🛍️','✈️','🎬','📱'];
 const DEFAULT_COLORS = ['#7C6EF5','#22D09A','#60A5FA','#F5B942','#F06060','#E879F9','#FB923C','#34D399','#FBBF24','#A78BFA','#38BDF8','#EF4444','#8B5CF6','#EC4899','#14B8A6'];
 
@@ -582,6 +655,7 @@ function totalBudget() {
 
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function today() { return new Date().toISOString().slice(0,10); }
+function now() { const d = new Date(); return d.toISOString().slice(11,16); }
 function fmt(n) { return parseFloat(n||0).toLocaleString('en-KW',{minimumFractionDigits:3,maximumFractionDigits:3}); }
 function fmtShort(n) {
   const v = parseFloat(n||0);
@@ -601,6 +675,7 @@ function showView(viewId) {
   if (nav) nav.classList.add('active');
   if (viewId === 'view-dashboard') renderDashboard();
   if (viewId === 'view-categories') renderCategories();
+  if (viewId === 'view-history') renderHistory();
 }
 
 // ============================================================
@@ -701,7 +776,7 @@ function openEditCategoryModal(catId) {
   const delBtn = document.getElementById('cat-delete-btn');
   if (!cat.isDefault) {
     delBtn.style.display = 'block';
-    delBtn.innerHTML = `<button class="btn-primary" style="background:var(--red)" onclick="confirmDeleteCategory('${catId}')">Delete Category</button>`;
+    delBtn.innerHTML = `<button class="btn-primary" style="background:var(--red)" onclick="confirmDeleteCategory('${catId}')">🗑 Delete Category</button>`;
   } else {
     delBtn.style.display = 'none';
   }
@@ -745,6 +820,8 @@ function saveCategory() {
   closeModal('modal-category');
   renderDashboard();
   renderCategories();
+  renderHistory();
+  showToast('Category saved ✓');
 }
 
 function confirmDeleteCategory(catId) {
@@ -759,23 +836,23 @@ function confirmDeleteCategory(catId) {
       document.getElementById('dialog-tx-move').onclick = () => {
         DATA.transactions.filter(t => t.category === catId).forEach(t => { t.category = null; });
         deleteCategory(catId);
-        closeDialog('dialog-transactions');
-        closeDialog('dialog-delete');
+        closeDialog('dialog-tx-handling');
+        closeDialog('dialog-delete-cat');
       };
       document.getElementById('dialog-tx-delete').onclick = () => {
         DATA.transactions = DATA.transactions.filter(t => t.category !== catId);
         deleteCategory(catId);
-        closeDialog('dialog-transactions');
-        closeDialog('dialog-delete');
+        closeDialog('dialog-tx-handling');
+        closeDialog('dialog-delete-cat');
       };
-      closeDialog('dialog-delete');
-      openDialog('dialog-transactions');
+      closeDialog('dialog-delete-cat');
+      openDialog('dialog-tx-handling');
     } else {
       deleteCategory(catId);
-      closeDialog('dialog-delete');
+      closeDialog('dialog-delete-cat');
     }
   };
-  openDialog('dialog-delete');
+  openDialog('dialog-delete-cat');
 }
 
 function deleteCategory(catId) {
@@ -784,6 +861,8 @@ function deleteCategory(catId) {
   closeModal('modal-category');
   renderDashboard();
   renderCategories();
+  renderHistory();
+  showToast('Category deleted ✓');
 }
 
 function restoreDefaultCategories() {
@@ -792,6 +871,7 @@ function restoreDefaultCategories() {
   save();
   renderCategories();
   renderDashboard();
+  renderHistory();
   showToast('Defaults restored ✓');
 }
 
@@ -799,10 +879,17 @@ function restoreDefaultCategories() {
 // TRANSACTION MANAGEMENT
 // ============================================================
 function openAddTransactionModal() {
+  document.getElementById('tx-description').value = '';
   document.getElementById('tx-amount').value = '';
   document.getElementById('tx-category').value = '';
   document.getElementById('tx-date').value = today();
-  document.getElementById('tx-notes').value = '';
+  document.getElementById('tx-time').value = now();
+  document.getElementById('tx-payment').value = 'card';
+  document.getElementById('tx-status').value = 'paid';
+  document.getElementById('tx-edit-id').value = '';
+  document.getElementById('modal-tx-title').textContent = 'Add Transaction';
+  document.getElementById('tx-save-btn').textContent = 'Add Transaction';
+  document.getElementById('tx-delete-btn').style.display = 'none';
   
   const sel = document.getElementById('tx-category');
   sel.innerHTML = '<option value="">Uncategorized</option>' +
@@ -813,27 +900,81 @@ function openAddTransactionModal() {
       .join('');
   
   openModal('modal-transaction');
-  setTimeout(() => document.getElementById('tx-amount').focus(), 300);
+  setTimeout(() => document.getElementById('tx-description').focus(), 300);
 }
 
-function addTransaction() {
+function openEditTransactionModal(txId) {
+  const tx = DATA.transactions.find(t => t.id === txId);
+  if (!tx) return;
+  
+  document.getElementById('tx-description').value = tx.description || '';
+  document.getElementById('tx-amount').value = tx.amount;
+  document.getElementById('tx-date').value = tx.date;
+  document.getElementById('tx-time').value = tx.time || '';
+  document.getElementById('tx-payment').value = tx.payment || 'card';
+  document.getElementById('tx-status').value = tx.status || 'paid';
+  document.getElementById('tx-category').value = tx.category || '';
+  document.getElementById('tx-edit-id').value = txId;
+  document.getElementById('modal-tx-title').textContent = 'Edit Transaction';
+  document.getElementById('tx-save-btn').textContent = 'Save Changes';
+  
+  const sel = document.getElementById('tx-category');
+  sel.innerHTML = '<option value="">Uncategorized</option>' +
+    DATA.categories
+      .filter(c => !c.isHidden)
+      .sort((a, b) => a.order - b.order)
+      .map(c => `<option value="${c.id}" ${c.id === tx.category ? 'selected' : ''}>${c.icon} ${c.name}</option>`)
+      .join('');
+  
+  const delBtn = document.getElementById('tx-delete-btn');
+  delBtn.style.display = 'block';
+  delBtn.innerHTML = `<button class="btn-primary" style="background:var(--red)" onclick="confirmDeleteTransaction('${txId}')">🗑 Delete Transaction</button>`;
+  
+  openModal('modal-transaction');
+}
+
+function saveTransaction() {
+  const description = document.getElementById('tx-description').value.trim();
   const amount = parseFloat(document.getElementById('tx-amount').value);
-  if (!amount || amount <= 0) return;
+  const editId = document.getElementById('tx-edit-id').value;
+  
+  if (!description) { alert('Please enter a description'); return; }
+  if (!amount || amount <= 0) { alert('Please enter a valid amount'); return; }
   
   const tx = {
-    id: uid(),
     amount,
     category: document.getElementById('tx-category').value || null,
     date: document.getElementById('tx-date').value || today(),
-    notes: document.getElementById('tx-notes').value.trim()
+    time: document.getElementById('tx-time').value || '',
+    payment: document.getElementById('tx-payment').value,
+    status: document.getElementById('tx-status').value,
+    description
   };
   
-  DATA.transactions.unshift(tx);
+  if (editId) {
+    const idx = DATA.transactions.findIndex(t => t.id === editId);
+    if (idx >= 0) {
+      DATA.transactions[idx] = { ...DATA.transactions[idx], ...tx };
+    }
+  } else {
+    DATA.transactions.unshift({ id: uid(), ...tx });
+  }
+  
   save();
   closeModal('modal-transaction');
   renderDashboard();
-  renderCategories();
-  showToast('Expense added ✓');
+  renderHistory();
+  showToast('Transaction saved ✓');
+}
+
+function confirmDeleteTransaction(txId) {
+  if (!confirm('Delete this transaction?')) return;
+  DATA.transactions = DATA.transactions.filter(t => t.id !== txId);
+  save();
+  closeModal('modal-transaction');
+  renderDashboard();
+  renderHistory();
+  showToast('Transaction deleted ✓');
 }
 
 // ============================================================
@@ -885,6 +1026,26 @@ function renderDashboard() {
     }).join('');
   
   document.getElementById('dash-categories').innerHTML = catHtml || '<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">No categories</div></div>';
+
+  // Recent transactions
+  const recent = [...DATA.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+  const recentHtml = recent.map(tx => {
+    const cat = tx.category ? getCat(tx.category) : null;
+    const dateObj = new Date(tx.date);
+    const dateStr = dateObj.toLocaleDateString('en-KW', { month: 'short', day: 'numeric' });
+    return `
+      <div class="tx-item" onclick="openEditTransactionModal('${tx.id}')">
+        <div class="tx-icon" style="background:${cat ? cat.color + '22' : 'rgba(160,160,180,0.1)'};color:${cat ? cat.color : '#9090A8'}">${cat ? cat.icon : '📦'}</div>
+        <div class="tx-info">
+          <div class="tx-desc">${tx.description}</div>
+          <div class="tx-meta">${dateStr}${tx.time ? ' ' + tx.time : ''} · <span class="tx-status ${tx.status}">${tx.status === 'paid' ? '✅' : '⏳'}</span></div>
+        </div>
+        <div class="tx-amount">-${fmt(tx.amount)} KD</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('dash-recent-tx').innerHTML = recentHtml || '<div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-title">No transactions</div></div>';
 }
 
 function renderCategories() {
@@ -911,6 +1072,43 @@ function renderCategories() {
     `).join('');
   
   document.getElementById('cat-list-container').innerHTML = html || '<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">No categories</div></div>';
+}
+
+function renderHistory() {
+  const catFilter = document.getElementById('tx-filter-cat').value;
+  const statusFilter = document.getElementById('tx-filter-status').value;
+  
+  let filtered = [...DATA.transactions].sort((a, b) => b.date.localeCompare(a.date));
+  if (catFilter) filtered = filtered.filter(t => t.category === catFilter);
+  if (statusFilter) filtered = filtered.filter(t => t.status === statusFilter);
+  
+  // Build category filter
+  const usedCats = [...new Set(DATA.transactions.map(t => t.category).filter(c => c))];
+  const catSel = document.getElementById('tx-filter-cat');
+  catSel.innerHTML = '<option value="">All Categories</option>' +
+    usedCats.map(id => {
+      const cat = getCat(id);
+      return `<option value="${id}">${cat.icon} ${cat.name}</option>`;
+    }).join('');
+  catSel.value = catFilter;
+
+  const html = filtered.map(tx => {
+    const cat = tx.category ? getCat(tx.category) : null;
+    const dateObj = new Date(tx.date);
+    const dateStr = dateObj.toLocaleDateString('en-KW', { month: 'short', day: 'numeric', year: '2-digit' });
+    return `
+      <div class="tx-item" onclick="openEditTransactionModal('${tx.id}')">
+        <div class="tx-icon" style="background:${cat ? cat.color + '22' : 'rgba(160,160,180,0.1)'};color:${cat ? cat.color : '#9090A8'}">${cat ? cat.icon : '📦'}</div>
+        <div class="tx-info">
+          <div class="tx-desc">${tx.description}</div>
+          <div class="tx-meta">${dateStr}${tx.time ? ' ' + tx.time : ''} · ${tx.payment ? tx.payment.charAt(0).toUpperCase() + tx.payment.slice(1) : 'Unknown'} · <span class="tx-status ${tx.status}">${tx.status === 'paid' ? '✅ Paid' : '⏳ Pending'}</span></div>
+        </div>
+        <div class="tx-amount">-${fmt(tx.amount)} KD</div>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('tx-list-container').innerHTML = html || '<div class="empty-state"><div class="empty-icon">🧾</div><div class="empty-title">No transactions</div><div class="empty-text">Tap + to add your first expense</div></div>';
 }
 
 // ============================================================
@@ -1002,6 +1200,7 @@ load();
 document.getElementById('income-input').value = DATA.income;
 renderDashboard();
 renderCategories();
+renderHistory();
 </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE = 'miza-v3';
+const CACHE = 'miza-v4';
 const ASSETS = ['./index.html', './manifest.json'];
 
 // IMPORTANT: Increment CACHE version string every time you deploy code changes.

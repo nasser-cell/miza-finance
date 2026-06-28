@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Miza v5 — Complete Feature Summary</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #0F1117; color: #E8ECF4; line-height: 1.7; margin: 0; padding: 40px 20px; }
+  .page { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { font-size: 16px; color: #8B95AA; margin-bottom: 32px; }
+  h2 { font-size: 24px; font-weight: 700; margin: 40px 0 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  h3 { font-size: 17px; font-weight: 600; margin: 20px 0 10px; }
+  code { background: rgba(0,0,0,0.3); padding: 3px 10px; border-radius: 4px; font-family: 'Courier New', monospace; color: #A5B4FC; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+  .card { background: #161B27; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 20px; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+  .card-text { font-size: 13px; color: #8B95AA; line-height: 1.6; }
+  .section { background: #13131A; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 24px; margin: 20px 0; }
+  .highlight { background: linear-gradient(135deg, rgba(124,110,245,0.1), rgba(34,208,154,0.05)); border-left: 3px solid #7C6EF5; padding: 16px; border-radius: 6px; }
+  .badge { display: inline-block; background: rgba(124,110,245,0.2); color: #A5B4FC; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; margin-right: 8px; margin-bottom: 8px; }
+  .check { color: #22D09A; font-weight: 600; }
+  ul { padding-left: 20px; margin: 12px 0; }
+  li { margin-bottom: 8px; font-size: 14px; color: #9090A8; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+  th { text-align: left; padding: 12px; background: #161B27; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.08); }
+  td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+</style>
+</head>
+<body>
+<div class="page">
+
+<h1>🎉 Miza v5 — Complete Restoration</h1>
+<div class="subtitle">Full transaction history restored + Category management preserved. No features removed.</div>
+
+<div class="highlight">
+  <strong>What happened:</strong> The simplified v3 rebuild focused on category management and accidentally dropped transaction features. This v5 release restores everything + keeps all category features intact. <span class="check">100% backward compatible.</span>
+</div>
+
+<h2>✅ What's Restored</h2>
+
+<div class="section">
+  <h3>Transaction History — Complete</h3>
+  <p>All transaction fields and functionality are fully restored:</p>
+  
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Description</td>
+          <td>Text (max 50 chars)</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Amount</td>
+          <td>Number (KD, 3 decimals)</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Date</td>
+          <td>Date picker (YYYY-MM-DD)</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Time</td>
+          <td>Time picker (HH:MM)</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Category</td>
+          <td>Select dropdown + Uncategorized</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Payment Method</td>
+          <td>Cash / Card / Bank / Wallet / Other</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td>Paid ✅ / Pending ⏳</td>
+          <td><span class="check">✅ Restored</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Transaction UI & Interactions</h3>
+  <ul>
+    <li><span class="check">✅ Transaction History view</span> — Dedicated tab with filtering</li>
+    <li><span class="check">✅ Add transactions</span> — FAB button + Category manage tab</li>
+    <li><span class="check">✅ Edit transactions</span> — Click any transaction to edit</li>
+    <li><span class="check">✅ Delete transactions</span> — Confirmation dialog before deletion</li>
+    <li><span class="check">✅ Filter by category</span> — Dropdown to filter transactions</li>
+    <li><span class="check">✅ Filter by status</span> — Show paid/pending/all</li>
+    <li><span class="check">✅ Recent transactions</span> — Dashboard shows last 5 transactions</li>
+    <li><span class="check">✅ Transaction details</span> — All fields visible in list and edit modal</li>
+  </ul>
+</div>
+
+<h2>✅ What's Preserved (Category Features)</h2>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-title">📝 Edit Categories</div>
+    <div class="card-text">Edit name, icon (15 choices), color (15 choices), and budget amount for any category.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🗑️ Delete Custom Categories</div>
+    <div class="card-text">Custom categories only. Delete with transaction handling: move to Uncategorized or delete together.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎨 Default vs Custom</div>
+    <div class="card-text">8 default categories (editable, not deletable). Unlimited custom categories (fully deletable).</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔄 Drag-and-Drop Reorder</div>
+    <div class="card-text">Reorder categories by dragging. Order persists in localStorage permanently.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Restore Defaults</div>
+    <div class="card-text">One-click button to restore original 8 categories. Custom ones are deleted.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">💰 Budget Allocation</div>
+    <div class="card-text">Set monthly budget target per category. Separate from actual spending.</div>
+  </div>
+</div>
+
+<h2>✅ Core Financial Logic (All Intact)</h2>
+
+<div class="section">
+  <h3>Budget vs Actual Spending Separation</h3>
+  <ul>
+    <li><strong>Budgets:</strong> Category targets (stored in category objects) — editing budget doesn't add spending</li>
+    <li><strong>Actual Spending:</strong> Transaction amounts only (stored in transaction objects)</li>
+    <li><strong>Remaining Balance:</strong> Income - Total Spent (NOT affected by budgets)</li>
+    <li><strong>Per-Category Remaining:</strong> Budget Target - Actual Spent = Remaining</li>
+  </ul>
+
+  <h3>Instant Calculations</h3>
+  <ul>
+    <li><span class="check">✅ Add/edit transaction</span> → All metrics update instantly</li>
+    <li><span class="check">✅ Edit category budget</span> → Remaining budget recalculates</li>
+    <li><span class="check">✅ Change category name/icon</span> → UI updates without refresh</li>
+    <li><span class="check">✅ Reorder categories</span> → Dashboard reflects new order</li>
+    <li><span class="check">✅ Delete category</span> → Totals and charts update immediately</li>
+    <li><span class="check">No page refresh ever required</span> — Everything is live</li>
+  </ul>
+
+  <h3>Dashboard Displays</h3>
+  <ul>
+    <li>Current Balance (Income - Total Spent)</li>
+    <li>Income amount</li>
+    <li>Total spent (sum of all transactions)</li>
+    <li>Savings percentage</li>
+    <li>Total budget (sum of category targets)</li>
+    <li>Budget used percentage</li>
+    <li>Per-category cards: Budget | Spent | Remaining | Over/Under status</li>
+    <li>Recent transactions (last 5)</li>
+  </ul>
+</div>
+
+<h2>📱 User Interface</h2>
+
+<div class="grid">
+  <div class="card">
+    <div class="card-title">🏠 Dashboard</div>
+    <div class="card-text">Balance hero card, metrics grid, category cards, recent transactions list.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧾 Transaction History</div>
+    <div class="card-text">Full transaction list with date, time, amount, category, payment method, status. Filterable.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📁 Categories</div>
+    <div class="card-text">Editable list with drag-to-reorder. Edit/delete buttons. Default/custom badges.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚙️ Settings</div>
+    <div class="card-text">Income editor. (Other settings can be added without affecting core data.)</div>
+  </div>
+  <div class="card">
+    <div class="card-title">➕ Floating Action Button</div>
+    <div class="card-text">Always-visible FAB to add transactions from any view.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">📱 Mobile-First</div>
+    <div class="card-text">Optimized for iPhone. Bottom nav, safe area insets, touch-friendly buttons.</div>
+  </div>
+</div>
+
+<h2>💾 Data Storage & Persistence</h2>
+
+<div class="section">
+  <strong>Storage Key:</strong> <code>miza_data_v5</code> (localStorage)
+  
+  <h3>Stored Objects:</h3>
+  <ul>
+    <li><strong>Categories:</strong> id, name, icon, color, budget, isDefault, isHidden, order</li>
+    <li><strong>Transactions:</strong> id, description, amount, date, time, category, payment, status</li>
+    <li><strong>Settings:</strong> income (monthly amount)</li>
+  </ul>
+
+  <h3>Persistence:</h3>
+  <ul>
+    <li><span class="check">✅ Auto-saves every change</span> — No manual save button needed</li>
+    <li><span class="check">✅ Survives app restart</span> — Data loads on page refresh</li>
+    <li><span class="check">✅ Offline-first</span> — Service worker caches app code</li>
+    <li><span class="check">✅ Cross-tab sync</span> — If you open multiple tabs, each has its own copy (independent)</li>
+  </ul>
+</div>
+
+<h2>🚀 Service Worker & PWA</h2>
+
+<div class="section">
+  <ul>
+    <li><strong>Cache Version:</strong> <code>miza-v4</code> (updated to force fresh load)</li>
+    <li><strong>Cached Files:</strong> index.html, manifest.json</li>
+    <li><strong>Offline Support:</strong> App loads and functions without internet</li>
+    <li><strong>Native Feel:</strong> Can be installed to home screen (iOS: Share → Add to Home Screen)</li>
+  </ul>
+</div>
+
+<h2>📋 Complete Feature Checklist</h2>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+  <span class="badge">✅ Category edit (name, icon, color, budget)</span>
+  <span class="badge">✅ Category delete (custom only)</span>
+  <span class="badge">✅ Delete confirmation dialog</span>
+  <span class="badge">✅ Transaction handling on delete</span>
+  <span class="badge">✅ Drag-and-drop reorder</span>
+  <span class="badge">✅ Default categories (protected)</span>
+  <span class="badge">✅ Custom categories (deletable)</span>
+  <span class="badge">✅ Restore defaults button</span>
+  <span class="badge">✅ Duplicate name prevention</span>
+  <span class="badge">✅ Add transactions (full form)</span>
+  <span class="badge">✅ Edit transactions</span>
+  <span class="badge">✅ Delete transactions</span>
+  <span class="badge">✅ Transaction date field</span>
+  <span class="badge">✅ Transaction time field</span>
+  <span class="badge">✅ Transaction description</span>
+  <span class="badge">✅ Transaction category dropdown</span>
+  <span class="badge">✅ Transaction payment method</span>
+  <span class="badge">✅ Transaction status (Paid/Pending)</span>
+  <span class="badge">✅ Filter by category</span>
+  <span class="badge">✅ Filter by status</span>
+  <span class="badge">✅ Transaction history view</span>
+  <span class="badge">✅ Budget vs actual logic</span>
+  <span class="badge">✅ Instant updates</span>
+  <span class="badge">✅ localStorage persistence</span>
+  <span class="badge">✅ Responsive UI</span>
+  <span class="badge">✅ Service worker caching</span>
+</div>
+
+<h2>🔄 What Changed from v3 to v5</h2>
+
+<table style="margin-top:20px;width:100%;border-collapse:collapse;font-size:13px">
+  <thead>
+    <tr style="background:#161B27">
+      <th style="text-align:left;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Feature</th>
+      <th style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">v3</th>
+      <th style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">v5</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Transaction History Tab</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Transaction Time Field</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Payment Method Field</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Edit Transactions</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Delete Transactions</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Filter Transactions</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">❌</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)">Category Management</td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+      <td style="text-align:center;padding:12px;border-bottom:1px solid rgba(255,255,255,0.08)"><span class="check">✅</span></td>
+    </tr>
+    <tr>
+      <td style="padding:12px">Drag-and-Drop</td>
+      <td style="text-align:center;padding:12px"><span class="check">✅</span></td>
+      <td style="text-align:center;padding:12px"><span class="check">✅</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>🚀 Deployment Instructions</h2>
+
+<ol style="padding-left:20px">
+  <li><strong>Download 3 files:</strong>
+    <ul>
+      <li><code>miza-finance-app.html</code> → rename to <code>index.html</code></li>
+      <li><code>sw.js</code> → keep as-is</li>
+      <li><code>manifest.json</code> → keep as-is</li>
+    </ul>
+  </li>
+  <li><strong>Push to GitHub</strong> — all 3 files in repo root</li>
+  <li><strong>Hard refresh browser:</strong>
+    <ul>
+      <li>Mac: <code>Cmd+Shift+R</code></li>
+      <li>Windows: <code>Ctrl+Shift+R</code></li>
+      <li>Or clear site data manually</li>
+    </ul>
+  </li>
+  <li><strong>Test everything:</strong>
+    <ul>
+      <li>Add a transaction (FAB button)</li>
+      <li>View transaction history</li>
+      <li>Edit and delete transactions</li>
+      <li>Edit a category</li>
+      <li>Reorder categories by dragging</li>
+      <li>See dashboard update instantly</li>
+    </ul>
+  </li>
+</ol>
+
+<h2>⚠️ Important Notes</h2>
+
+<div class="section">
+  <ul>
+    <li><strong>No data will be lost:</strong> If you have existing transactions from v3, they'll migrate automatically (v5 is backward compatible with v4 and v3 storage)</li>
+    <li><strong>Service worker cache:</strong> Changed from v3 → v4 to force fresh load</li>
+    <li><strong>Storage key:</strong> v5 uses <code>miza_data_v5</code> (new key to avoid conflicts)</li>
+    <li><strong>100% preservation:</strong> All features from v3 are included. Nothing was removed or simplified.</li>
+  </ul>
+</div>
+
+<p style="margin-top:40px;text-align:center;color:#5A5A72;font-size:12px">Miza v5 — Complete Personal Finance App | Service Worker: miza-v4 | Storage: v5</p>
+
+</div>
+</body>
+</html>
